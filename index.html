@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Malta Bus Tour — Audio Guide</title>
+<meta name="description" content="Onboard audio guide for the Malta bus tour: follow the map and listen to the story of every stop." />
+<meta name="theme-color" content="#0a3d62" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- ============ VISTA 1: LANDING ============ -->
+<main id="view-landing" class="view view-landing">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-icon">🚌</span>
+      <span class="brand-name" data-i18n="brandName">Malta Bus Tour</span>
+    </div>
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" class="lang-btn" data-lang="it">IT</button>
+      <button type="button" class="lang-btn" data-lang="en">EN</button>
+      <button type="button" class="lang-btn" data-lang="fr">FR</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-text">
+      <p class="eyebrow" data-i18n="eyebrow">Onboard audio guide</p>
+      <h1><span data-i18n="heroTitleLine1">Discover Malta,</span><br/><span data-i18n="heroTitleLine2">one stop at a time</span></h1>
+      <p class="hero-sub" data-i18n="heroSub">
+        Follow the bus route on the map: at every stop, the story starts playing automatically.
+      </p>
+      <button id="btn-start" class="btn-primary">
+        <span data-i18n="startBtn">Start the tour</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 4L18 12L6 20V4Z" fill="currentColor"/>
+        </svg>
+      </button>
+      <p class="hero-hint" data-i18n="heroHint">Allow location access when prompted for the full experience</p>
+    </div>
+
+    <div class="hero-map" aria-hidden="true">
+      <svg id="malta-svg" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#0d4a6e"/>
+            <stop offset="100%" stop-color="#062338"/>
+          </linearGradient>
+          <linearGradient id="landGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#f2cf7e"/>
+            <stop offset="100%" stop-color="#dba43e"/>
+          </linearGradient>
+          <linearGradient id="routeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#ffb27a"/>
+            <stop offset="100%" stop-color="#e2555f"/>
+          </linearGradient>
+          <pattern id="dotGrid" width="18" height="18" patternUnits="userSpaceOnUse">
+            <circle cx="1" cy="1" r="1" fill="#ffffff" opacity="0.06"/>
+          </pattern>
+          <filter id="dropShadow" x="-40%" y="-40%" width="180%" height="180%">
+            <feDropShadow dx="0" dy="2" stdDeviation="2.2" flood-color="#04202f" flood-opacity="0.45"/>
+          </filter>
+        </defs>
+
+        <rect x="0" y="0" width="400" height="300" rx="22" fill="url(#bgGrad)"/>
+        <rect x="0" y="0" width="400" height="300" rx="22" fill="url(#dotGrid)"/>
+
+        <!-- cornice cartografica -->
+        <rect x="10" y="10" width="380" height="280" rx="14" fill="none" stroke="#ffffff" stroke-opacity="0.12" stroke-width="1"/>
+
+        <!-- rosa dei venti, angolo in alto a destra -->
+        <g transform="translate(360,38)" opacity="0.55">
+          <circle r="16" fill="none" stroke="#f2cf7e" stroke-width="1"/>
+          <path d="M0,-13 L3,-2 L0,2 L-3,-2 Z" fill="#f2cf7e"/>
+          <path d="M0,13 L3,2 L0,-2 L-3,2 Z" fill="#ffffff" fill-opacity="0.5"/>
+          <text x="0" y="-19" text-anchor="middle" font-size="7" fill="#f2cf7e" font-family="Inter, sans-serif">N</text>
+        </g>
+
+        <!-- ombra soffusa sotto le isole -->
+        <ellipse cx="198" cy="182" rx="112" ry="20" fill="#03151f" opacity="0.35"/>
+
+        <!-- Gozo -->
+        <path class="island-shape" d="M128,72 C120,60 132,49 152,48 C170,47 186,54 184,68
+             C182,82 166,90 148,89 C134,88 134,82 128,72 Z" fill="url(#landGrad)" stroke="#a9781f" stroke-width="1.5" filter="url(#dropShadow)"/>
+        <!-- Comino -->
+        <circle class="island-shape" cx="148" cy="97" r="5.5" fill="url(#landGrad)" stroke="#a9781f" stroke-width="1"/>
+
+        <!-- Malta -->
+        <path class="island-shape malta-main"
+          d="M108,168 C100,150 108,132 128,120 C146,109 168,104 190,106
+             C214,108 240,112 258,124 C274,134 282,150 276,166
+             C270,183 250,192 228,196 C222,197 216,204 204,206
+             C182,210 158,208 140,198 C124,189 114,183 108,168 Z"
+          fill="url(#landGrad)" stroke="#a9781f" stroke-width="1.5" filter="url(#dropShadow)"/>
+
+        <!-- percorso: disegnato una sola volta all'apertura -->
+        <path id="route-path"
+          d="M150,160 C168,145 182,178 205,158 C224,141 244,168 262,140"
+          fill="none" stroke="url(#routeGrad)" stroke-width="3"
+          stroke-linecap="round"/>
+
+        <!-- tappe: pin vettoriali, con ingresso a cascata -->
+        <g class="pin pin-1" transform="translate(150,160)">
+          <path d="M0,-13 C6,-13 10,-9 10,-4 C10,3 0,13 0,13 C0,13 -10,3 -10,-4 C-10,-9 -6,-13 0,-13 Z" fill="#fdf6ec" filter="url(#dropShadow)"/>
+          <circle cx="0" cy="-4" r="3.4" fill="#0a3d62"/>
+        </g>
+        <g class="pin pin-2" transform="translate(205,158)">
+          <path d="M0,-13 C6,-13 10,-9 10,-4 C10,3 0,13 0,13 C0,13 -10,3 -10,-4 C-10,-9 -6,-13 0,-13 Z" fill="#fdf6ec" filter="url(#dropShadow)"/>
+          <circle cx="0" cy="-4" r="3.4" fill="#0a3d62"/>
+        </g>
+        <g class="pin pin-3 pin-end" transform="translate(262,140)">
+          <path d="M0,-13 C6,-13 10,-9 10,-4 C10,3 0,13 0,13 C0,13 -10,3 -10,-4 C-10,-9 -6,-13 0,-13 Z" fill="#fdf6ec" filter="url(#dropShadow)"/>
+          <circle cx="0" cy="-4" r="3.4" fill="#d1495b"/>
+          <circle class="pin-ring" cx="0" cy="-4" r="3.4" fill="none" stroke="#d1495b" stroke-width="1.4"/>
+        </g>
+
+        <!-- bus: icona vettoriale su motion path -->
+        <g class="bus-group">
+          <circle class="bus-ring" r="10" fill="#d1495b" opacity="0.35"/>
+          <g class="bus-icon-vec" filter="url(#dropShadow)">
+            <rect x="-9" y="-6" width="18" height="11" rx="3" fill="#e8544f"/>
+            <rect x="-6.5" y="-4" width="13" height="4.5" rx="1" fill="#eaf4fb"/>
+            <circle cx="-5" cy="6" r="2.4" fill="#1c2b33"/>
+            <circle cx="5" cy="6" r="2.4" fill="#1c2b33"/>
+          </g>
+          <animateMotion dur="13s" repeatCount="indefinite" rotate="0"
+            path="M150,160 C168,145 182,178 205,158 C224,141 244,168 262,140"/>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <section class="preview-list">
+    <h2 data-i18n="previewHeading">Tour stops</h2>
+    <ul id="preview-stops" class="stop-preview-grid"></ul>
+  </section>
+
+  <footer class="landing-footer">
+    <p data-i18n="footer">Have a great trip and enjoy Malta! 🇲🇹</p>
+  </footer>
+</main>
+
+<!-- ============ VISTA 2: TOUR ATTIVO ============ -->
+<main id="view-tour" class="view view-tour hidden">
+
+  <header class="tour-topbar">
+    <button id="btn-back" class="btn-icon" aria-label="Go back">←</button>
+    <div class="tour-title">
+      <strong data-i18n="tourTitle">Tour in progress</strong>
+      <span id="tour-progress">—</span>
+    </div>
+    <div class="lang-switch lang-switch-compact" role="group" aria-label="Language">
+      <button type="button" class="lang-btn" data-lang="it">IT</button>
+      <button type="button" class="lang-btn" data-lang="en">EN</button>
+      <button type="button" class="lang-btn" data-lang="fr">FR</button>
+    </div>
+    <button id="btn-demo" class="btn-chip">
+      ▶ <span data-i18n="demoBtn">Simulate arrival</span>
+    </button>
+  </header>
+
+  <div id="map" class="map"></div>
+
+  <section id="now-playing" class="now-playing hidden">
+    <div class="now-playing-inner">
+      <div class="np-icon" id="np-icon">🏰</div>
+      <div class="np-text">
+        <p class="np-label" data-i18n="nowPlayingLabel">Now playing</p>
+        <h3 id="np-title">—</h3>
+        <p id="np-caption" class="np-caption">—</p>
+      </div>
+      <div class="np-controls">
+        <button id="np-replay" class="btn-icon" aria-label="Replay">↺</button>
+        <button id="np-toggle" class="btn-icon btn-icon-primary" aria-label="Play/Pause">⏸</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="stop-list">
+    <h2 data-i18n="stopListHeading">All stops</h2>
+    <ul id="stop-list"></ul>
+  </section>
+</main>
+
+<audio id="audio-player" preload="none"></audio>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="js/stops.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,479 @@
+:root {
+  --sea-deep: #06283d;
+  --sea-blue: #0a3d62;
+  --sea-light: #134b73;
+  --gold: #e8b84b;
+  --gold-soft: #f3d38a;
+  --terracotta: #d1495b;
+  --orange: #ff8a5c;
+  --cream: #fdf6ec;
+  --ink: #1c2b33;
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --shadow: 0 10px 30px rgba(6, 40, 61, 0.15);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1, h2, h3 {
+  font-family: 'Playfair Display', serif;
+  margin: 0;
+}
+
+.hidden { display: none !important; }
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+}
+
+/* ---------- TOPBAR ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  padding: 18px 20px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--sea-blue);
+}
+.brand-icon { font-size: 22px; }
+.brand-name { font-size: 17px; letter-spacing: 0.2px; }
+
+.topbar { justify-content: space-between; }
+
+/* ---------- SELETTORE LINGUA ---------- */
+.lang-switch {
+  display: flex;
+  gap: 4px;
+  background: rgba(10,61,98,.07);
+  padding: 4px;
+  border-radius: 50px;
+}
+.lang-btn {
+  background: transparent;
+  color: var(--sea-blue);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 11px;
+  border-radius: 50px;
+  letter-spacing: .3px;
+  transition: background .15s ease, color .15s ease;
+}
+.lang-btn.active {
+  background: var(--sea-blue);
+  color: white;
+}
+.lang-switch-compact {
+  background: rgba(255,255,255,.1);
+}
+.lang-switch-compact .lang-btn {
+  color: #cfe0ea;
+  font-size: 11px;
+  padding: 5px 8px;
+}
+.lang-switch-compact .lang-btn.active {
+  background: var(--terracotta);
+  color: white;
+}
+
+/* ---------- HERO ---------- */
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 10px 20px 30px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+@media (min-width: 860px) {
+  .hero {
+    flex-direction: row;
+    align-items: center;
+    padding-top: 30px;
+  }
+  .hero-text { flex: 1; }
+  .hero-map { flex: 1; }
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--terracotta);
+  margin: 0 0 10px;
+}
+.hero-text h1 {
+  font-size: clamp(28px, 6vw, 44px);
+  line-height: 1.15;
+  color: var(--sea-deep);
+}
+.hero-sub {
+  margin: 16px 0 24px;
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: #45606f;
+  max-width: 46ch;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, var(--terracotta), var(--orange));
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 15px 26px;
+  border-radius: 50px;
+  box-shadow: 0 8px 20px rgba(209, 73, 91, 0.35);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(209,73,91,.4); }
+.btn-primary:active { transform: translateY(0); }
+.btn-primary svg { transition: transform .15s ease; }
+.btn-primary:hover svg { transform: translateX(3px); }
+
+.hero-hint {
+  margin: 14px 0 0;
+  font-size: 12.5px;
+  color: #7d92a0;
+}
+
+/* ---------- HERO MAP (SVG animata) ---------- */
+.hero-map svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+/* Isole: leggerissimo assestamento in ingresso, poi ferme (niente loop
+   perenne: più elegante e non distrae dal contenuto) */
+.island-shape {
+  animation: landSettle 1.1s cubic-bezier(.2,.8,.2,1) both;
+}
+.malta-main { animation-delay: .05s; }
+
+@keyframes landSettle {
+  from { opacity: 0; transform: translateY(6px) scale(.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Percorso: si disegna una sola volta (linea piena), poi resta fermo.
+   420 è una lunghezza abbondante rispetto al tracciato reale, cosi la
+   linea parte completamente nascosta indipendentemente dalla curva usata. */
+#route-path {
+  stroke-dasharray: 420;
+  stroke-dashoffset: 420;
+  animation: drawRoute 1.8s .5s cubic-bezier(.3,.7,.3,1) both;
+}
+@keyframes drawRoute {
+  to { stroke-dashoffset: 0; }
+}
+
+/* Pin: comparsa in cascata, poi fermi. Solo il pin finale ha un accento
+   pulsante continuo, per guidare l'occhio senza affaticarlo */
+.pin {
+  opacity: 0;
+  animation: pinIn .5s cubic-bezier(.2,.8,.2,1) both;
+  transform-origin: center;
+}
+.pin-1 { animation-delay: .55s; }
+.pin-2 { animation-delay: .85s; }
+.pin-3 { animation-delay: 1.15s; }
+
+@keyframes pinIn {
+  from { opacity: 0; transform: translateY(-6px) scale(.6); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.pin-end .pin-ring {
+  animation: pinRing 2.2s ease-out 1.8s infinite;
+  transform-origin: center;
+}
+@keyframes pinRing {
+  0% { r: 3.4; opacity: .9; }
+  100% { r: 10; opacity: 0; }
+}
+
+/* Bus: percorre il tragitto con un anello che pulsa dietro di sé */
+.bus-ring {
+  animation: busRing 1.6s ease-out infinite;
+  transform-origin: center;
+}
+@keyframes busRing {
+  0% { r: 8; opacity: .4; }
+  100% { r: 15; opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .island-shape, .pin, .pin-ring, .bus-ring, #route-path {
+    animation: none !important;
+  }
+  .pin { opacity: 1; }
+  #route-path { stroke-dashoffset: 0; }
+  .bus-group animateMotion { display: none; }
+}
+
+/* ---------- PREVIEW STOPS ---------- */
+.preview-list {
+  max-width: 1100px;
+  margin: 10px auto 0;
+  padding: 10px 20px 40px;
+}
+.preview-list h2 {
+  font-size: 22px;
+  color: var(--sea-deep);
+  margin-bottom: 16px;
+}
+.stop-preview-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+.stop-preview-grid li {
+  background: white;
+  border-radius: var(--radius-md);
+  padding: 16px 14px;
+  box-shadow: 0 4px 14px rgba(6,40,61,.06);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid rgba(10,61,98,.06);
+}
+.stop-preview-grid .emoji { font-size: 26px; }
+.stop-preview-grid .name { font-weight: 700; font-size: 14.5px; color: var(--sea-deep); }
+.stop-preview-grid .sub { font-size: 12.5px; color: #7d92a0; }
+.stop-preview-grid .order-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--terracotta);
+}
+
+.landing-footer {
+  text-align: center;
+  padding: 10px 20px 40px;
+  color: #8398a5;
+  font-size: 13px;
+}
+
+/* ---------- TOUR VIEW ---------- */
+.view-tour {
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.tour-topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--sea-deep);
+  color: white;
+  z-index: 20;
+}
+.tour-title {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+.tour-title strong { font-size: 14.5px; }
+.tour-title span { font-size: 12px; color: #a9c2d0; }
+
+.btn-icon {
+  background: rgba(255,255,255,.12);
+  color: white;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.btn-icon-primary { background: var(--terracotta); }
+
+.btn-chip {
+  background: rgba(255,255,255,.14);
+  color: white;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 9px 12px;
+  border-radius: 50px;
+  white-space: nowrap;
+}
+.btn-chip:active { background: rgba(255,255,255,.25); }
+
+.map {
+  flex: 1;
+  min-height: 220px;
+  z-index: 1;
+}
+
+/* marker personalizzati leaflet */
+.stop-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 3px 10px rgba(0,0,0,.25);
+  border: 2px solid var(--sea-blue);
+}
+.stop-icon.visited { border-color: #4caf82; opacity: .85; }
+.stop-icon.active {
+  border-color: var(--terracotta);
+  animation: activePulse 1.4s ease-in-out infinite;
+}
+@keyframes activePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(209,73,91,.5); }
+  50% { box-shadow: 0 0 0 10px rgba(209,73,91,0); }
+}
+.bus-icon { font-size: 22px; filter: drop-shadow(0 2px 4px rgba(0,0,0,.35)); }
+
+/* ---------- NOW PLAYING ---------- */
+.now-playing {
+  background: white;
+  border-top: 1px solid rgba(10,61,98,.08);
+  box-shadow: 0 -6px 18px rgba(6,40,61,.08);
+  z-index: 15;
+}
+.now-playing-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.np-icon {
+  font-size: 26px;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.np-text { flex: 1; min-width: 0; }
+.np-label {
+  margin: 0;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  color: var(--terracotta);
+  font-weight: 700;
+}
+.np-text h3 {
+  font-size: 15.5px;
+  color: var(--sea-deep);
+  margin: 2px 0 2px;
+}
+.np-caption {
+  margin: 0;
+  font-size: 12.5px;
+  color: #7d92a0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.np-controls {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.np-controls .btn-icon {
+  background: var(--cream);
+  color: var(--sea-blue);
+  width: 36px;
+  height: 36px;
+}
+
+/* ---------- STOP LIST (tour view) ---------- */
+.stop-list {
+  padding: 14px 14px 22px;
+  overflow-y: auto;
+  background: var(--cream);
+}
+.stop-list h2 {
+  font-size: 16px;
+  color: var(--sea-deep);
+  margin-bottom: 10px;
+}
+.stop-list ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+
+.stop-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  box-shadow: 0 3px 10px rgba(6,40,61,.05);
+  border: 1px solid rgba(10,61,98,.05);
+}
+.stop-row .num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--sea-blue);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.stop-row.visited .num { background: #4caf82; }
+.stop-row.active .num { background: var(--terracotta); }
+
+.stop-row .emoji { font-size: 20px; flex-shrink: 0; }
+.stop-row .info { flex: 1; min-width: 0; }
+.stop-row .info .name { font-weight: 700; font-size: 14px; color: var(--sea-deep); }
+.stop-row .info .status { font-size: 11.5px; color: #8398a5; }
+.stop-row.active .info .status { color: var(--terracotta); font-weight: 600; }
+
+.stop-row .play-btn {
+  background: var(--cream);
+  color: var(--sea-blue);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.stop-row.active .play-btn { background: var(--terracotta); color: white; }
+
+/* ---------- Leaflet popup override minimo ---------- */
+.leaflet-popup-content { font-family: 'Inter', sans-serif; font-size: 13px; }
